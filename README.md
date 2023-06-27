@@ -1,16 +1,31 @@
-# Installation Instructions
+# Pattern data generation & Drone Swarming Simulation    
+## Pattern data generation :    
+<div align="center">
+  <img src="img-videos/heartPoints.gif" alt="gif" />
+</div>
 
-## Installing ROS
 
-Install ROS Noetic from http://wiki.ros.org/noetic/Installation/Ubuntu
+## Pattern formation :    
+<div align="center">
+  <video controls>
+    <source src="img-videos/heartFormation.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+</div>
 
-## Installing Ardupilot and MAVProxy Ubuntu 20.04
+---   
 
-### Video Tutorial at https://youtu.be/1FpJvUVPxL0
+## Setup requirements :    
+- ubuntu 20.04 LTS Desktop version
+- ros-noetic-desktop-full
+- python 3.7+
 
-### Clone ArduPilot
+---
+## Setup & Installations 
 
-In home directory:
+### 1. Install Ardupilot and MAVProxy for Ubuntu 20.04 :
+
+- Clone ArduPilot in home directory
 ```
 cd ~
 sudo apt install git
@@ -18,72 +33,38 @@ git clone https://github.com/ArduPilot/ardupilot.git
 cd ardupilot
 ```
 
-### Install dependencies:
+- Install dependencies
 ```
 cd ardupilot
 Tools/environment_install/install-prereqs-ubuntu.sh -y
 ```
 
-reload profile
+- Reload profile 
 ```
 . ~/.profile
 ```
 
-### Checkout Latest Copter Build
+- Checkout Latest Copter Build
 ```
 git checkout Copter-4.2
 git submodule update --init --recursive
 ```
 
-Run SITL (Software In The Loop) once to set params:
+- Run SITL (Software In The Loop) once to set params:
 ```
 cd ~/ardupilot/ArduCopter
 sim_vehicle.py -w
 ```
-## Installing Gazebo and ArduPilot Plugin
 
-### Video Tutorial at https://youtu.be/m7hPyJJmWmU
-
-### Overview 
-
-Robot simulation is an essential tool in every roboticist's toolbox. A well-designed simulator makes it possible to rapidly test algorithms, design robots, perform regression testing, and train AI system using realistic scenarios. Gazebo offers the ability to accurately and efficiently simulate populations of robots in complex indoor and outdoor environments. At your fingertips is a robust physics engine, high-quality graphics, and convenient programmatic and graphical interfaces. Best of all, Gazebo is free with a vibrant community.
-
-for more infromation on gazebo checkout http://gazebosim.org/
-
-### Install Gazebo 
-
-Setup your computer to accept software from http://packages.osrfoundation.org:
-```
-sudo sh -c 'echo "deb http://packages.osrfoundation.org/gazebo/ubuntu-stable `lsb_release -cs` main" > /etc/apt/sources.list.d/gazebo-stable.list'
-```
-
-Setup keys:
-```
-wget http://packages.osrfoundation.org/gazebo.key -O - | sudo apt-key add -
-```
-
-Reload software list:
-```
-sudo apt update
-```
-
-Install Gazebo:
-
-```
-sudo apt-get install gazebo11 libgazebo11-dev
-```
-
-for more detailed instructions for installing gazebo checkout http://gazebosim.org/tutorials?tut=install_ubuntu
-
-
-### Install Gazebo plugin for APM (ArduPilot Master) :
+### 2. Install Gazebo plugin for APM (ArduPilot Master) :
+- Clone the the repo in home directory
 ```
 cd ~
 git clone https://github.com/khancyr/ardupilot_gazebo.git
 cd ardupilot_gazebo
 ```
 
-build and install plugin
+- build and install plugin
 ```
 mkdir build
 cd build
@@ -91,56 +72,118 @@ cmake ..
 make -j4
 sudo make install
 ```
+
+- write sourcing command in `.bashrc` file
 ```
 echo 'source /usr/share/gazebo/setup.sh' >> ~/.bashrc
 ```
-Set paths for models:
+- Set paths for models:
 ```
 echo 'export GAZEBO_MODEL_PATH=~/ardupilot_gazebo/models' >> ~/.bashrc
 . ~/.bashrc
 ```
-## Setting up the workspace
+### 3. Setting up the workspace :  
+- Create a ROS workspace to run this package in home directory
 ```
 cd
-mkdir -p catkin_ws/src
-cd catkin_ws/src
-git clone https://github.com/Blackhawk2624/Blackhawk_PS.git
+mkdir -p drone_ws/src
+cd drone_ws/src
+git clone https://github.com/ab31mohit/drone_swarming.git
 cd ..
 catkin_make
 ```
 
-## Environment Setup
+- Write sourcing command to `.bashrc` file
 ```
-echo "source ~/catkin_ws/devel/setup.bash" >> ~/.bashrc
+echo "source ~/drone_ws/devel/setup.bash" >> ~/.bashrc
 source ~/.bashrc
 ```
 
-## Note
+- Copy & paste the contents of `models_drones` folder to `/home/username/.gazebo/models` directory. In case you don't have a *models* folder inside *.gazebo* folder then create one and then paste the contents into that.    
 
-1. Extract the content of default_params.zip and paste gazebo-drone1.parm, gazebo-drone2.parm ... gazebo-drone12.parm in /home/username/ardupilot/Tools/autotest/default_params directory
-2. Replace /home/username/ardupilot/Tools/autotest/pysim/vehicleinfo.py file with vehicleinfo.py(present in this repository) file
-3. Extract the content of model_drones.zip and paste drone1, drone2 ... drone12 in /home/username/.gazebo/models directory
+- Copy & paste the contents of `default_params` folder to `home/username/ardupilot/Tools/autotest/default_params` directory.   
 
-## Running the world
+- Replace `/home/username/ardupilot/Tools/autotest/pysim/vehicleinfo.py` file with *vehicleinfo.py* (present in this repository) file.
 
-In Terminal 1
+- Change the ***path*** variables in `generatePattern.py`, `master.py`, `patternFormation.sh` according to you system.
+
+---
+
+## Running the Package : 
+
+- First check if everything is working or not by running following command in the terminal  
 ```
-roslaunch iq_sim blackhawk.launch 
+roslaunch drone_swarming drone1to12_line.launch  
 ```
-In Terminal 2
+
+It should open the following world in gazebo    
+<div align="center">
+  <img src="img-videos/line_world.png" alt="gazebo-world" />
+</div>
+
+
+- Open a new tab of the terminal and run
 ```
-roscd iq_sim
-./blackhawk.sh
-OR
-bash blackhawk.sh
+roscd drone_swarming/SITL\ config
+bash ./startSITL.sh
 ```
-## World
-![iq](world.jpg)
+It should open a new terminal window with 12 tabs like this    
+<div align="center">
+  <img src="img-videos/SITL.png" alt="SITL-img" />
+</div>
 
-## References
+If the above 2 steps are successfull on your system then setup is done. You can close the 2 processes for now.    
+First step for drone swarming is to generate the target data for each drone to follow for pattern formation.    
+Below are the steps for same.
 
-1. https://github.com/Intelligent-Quads/iq_tutorials
-2. https://youtu.be/r15Tc6e2K7Y
-3. https://youtu.be/UWsya46ZG4M
-4. https://youtu.be/kcCL0w4NbIc
+- Install the required python libraries by running the command    
+```
+roscd drone_swarming/
+pip3 install -r requirements.txt
+```
+- To Run the scripts for generating Pattern Points run the *generatePattern.py* script    
+(assuming you have already changed the path variables in the script files as told in above steps)
+```
+roscd drone_swarming/patternFormation/scripts/
+python3 generatePattern.py
+```
+This script will use the image as input present in `input_image` folder.    
+It will prompt for you writing the json filename to store the data coordinate data of points for pattern formation. Write the filename & then press enter.    
+The json file will be stored inside `pattern_data_output` folder.   
+    
+Second and final step is to launch world file, run sitl and bash files.    
+Below are the steps for same.    
 
+- Launch the world file
+```
+roslaunch drone_swarming drone1to12_line.launch
+```
+
+- Start SITL
+```
+roscd drone_swarming/SITL\ config
+bash ./startSITL.sh
+```
+
+Now wait for some time until the GPS is detected. It should show the following lines    
+<div align="center">
+  <img src="img-videos/sitlGPS_detected.png" alt="SITL-img" />
+</div>
+
+- Now open a new tab in the old terminal window and run
+```
+roscd drone_swarming/patternFormation/scripts/
+python3 master.py
+```
+
+It will prompt you for specifying the json file whose pattern you want to generate.
+This will publish the coordinate data of points saved in the above json file as the target points for each drone in respective ros topics - `/D1`, `/D2` and so on.
+
+- Open a new tab of the terminal and run
+```
+roscd drone_swarming/patternFormation/scripts/
+bash ./patternFormation.sh
+```
+
+## Note:    
+For using this package for some another pattern, please follow the same image styles as being used in the `image_input` folder. These images are being generated using desmos and the mask values for image processing operations are set according to these styles only. For using some other color or type of image, please change the parameters in the ***PatternClass.py*** module.
