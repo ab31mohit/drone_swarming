@@ -6,12 +6,8 @@
 
 
 ## Pattern formation :    
-<div align="center">
-  <video controls>
-    <source src="img-videos/heartFormation.mp4" type="video/mp4">
-    Your browser does not support the video tag.
-  </video>
-</div>
+
+https://github.com/ab31mohit/drone_swarming/assets/99829827/8cf5f853-6560-40ba-8c4e-d0e5fcbfdb2c
 
 ---   
 
