@@ -1,3 +1,5 @@
+![GitHub repo size](https://img.shields.io/github/repo-size/ab31mohit/drone_swarming)
+
 # Pattern data generation & Drone Swarming Simulation    
 ## Pattern data generation :    
 <div align="center">
